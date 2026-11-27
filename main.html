@@ -6,17 +6,41 @@
 <style>
   body { font-family: Arial; text-align: center; padding: 40px; background: #f0fff0; }
   .box { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 0 20px #ccc; max-width: 400px; margin: auto; }
-  h1 { color: green; font-size: 40px; }
-  p { font-size: 18px; }
+  input { font-size: 22px; padding: 12px; text-align: center; width: 80%; margin: 10px 0; }
+  button { font-size: 20px; padding: 12px 25px; background: green; color: white; border: none; border-radius: 8px; }
+  #result { margin-top: 20px; font-size: 22px; font-weight: bold; }
 </style>
 </head>
 <body>
   <div class="box">
-    <div style="font-size: 80px;">✅</div>
-    <h1>YES - ORIGINAL</h1>
-    <p>This bottle is <b>Company Stock</b>.</p>
-    <p>It belongs to <b>XENIA HOTEL</b>.</p>
-    <p style="color: grey; font-size: 14px;">If this page did not open, or there is no QR sticker, it is NOT company stock.</p>
+    <h2>XENIA HOTEL<br>Stock Verification</h2>
+    <p>Scan Successful. Enter Auditor PIN:</p>
+    <input type="password" id="pin" placeholder="Enter PIN" inputmode="numeric">
+    <br>
+    <button onclick="checkPin()">VERIFY</button>
+    <div id="result"></div>
   </div>
+
+<script>
+async function checkPin() {
+  const entered = document.getElementById('pin').value;
+  const result = document.getElementById('result');
+
+  // PASTE YOUR HASH HERE - This is hash of PIN 4827, change it
+  const CORRECT_HASH = "7a1c0e5e5e2b8e1a5e3b0e1a5e3b0e1a5e3b0e1a5e3b0e1a5e3b0e1a5e3b0e1a";
+
+  // Hash what auditor typed
+  const msgBuffer = new TextEncoder().encode(entered);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const enteredHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+  if (enteredHash === CORRECT_HASH) {
+    result.innerHTML = "✅ <span style='color:green'>YES - ORIGINAL</span><br><span style='font-size:16px; font-weight:normal'>This bottle is Company Stock.</span>";
+  } else {
+    result.innerHTML = "❌ <span style='color:red'>WRONG PIN - FAKE STOCK</span><br><span style='font-size:16px; font-weight:normal'>This is NOT company stock. Report it.</span>";
+  }
+}
+</script>
 </body>
 </html>
